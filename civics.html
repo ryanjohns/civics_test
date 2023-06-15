@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Civics Test</title>
+    <link rel="apple-touch-icon" href="uscis-apple-touch-icon.png" />
+    <style>
+      body {
+        background-color: #333;
+        color: #fff;
+        font-family: Helvetica;
+        margin: 0;
+        font-size: 42px;
+      }
+
+      #header {
+        padding: 20px;
+        margin-bottom: 60px;
+        background-color: #111;
+      }
+
+      #topic {
+        text-align: center;
+        font-size: 36px;
+        padding: 20px;
+        margin-bottom: 60px;
+      }
+
+      #question {
+        padding: 20px;
+      }
+
+      #answers {
+        padding: 40px;
+        margin-bottom: 100px;
+      }
+
+      #actions {
+        background-color: #111;
+        overflow: hidden;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        padding: 20px;
+      }
+
+      table {
+        width: 100%;
+      }
+
+      td.stat-name {
+        text-align: right;
+        padding-right: 30px;
+      }
+
+      td.stat-value {
+        text-align: left;
+      }
+    </style>
+
+    <script>
+      /*
+        Questions for the 2008 USCIS Civics Test taken from:
+        https://www.uscis.gov/citizenship/find-study-materials-and-resources/study-for-the-test/100-civics-questions-and-answers-with-mp3-audio-english-version
+
+        Test updates for dynamic questions taken from:
+        https://www.uscis.gov/citizenship/find-study-materials-and-resources/check-for-test-updates
+      */
+      const QUESTIONS = [
+        {
+          "topic": "Principles of American Democracy",
+          "question": "What is the supreme law of the land?",
+          "answers": ["the Constitution"]
+        },
+        {
+          "topic": "Principles of American Democracy",
+          "question": "What does the Constitution do?",
+          "answers": ["sets up the government", "defines the government", "protects basic rights of Americans"]
+        },
+        {
+          "topic": "Principles of American Democracy",
+          "question": "The idea of self-government is in the first three words of the Constitution. What are these words?",
+          "answers": ["We the People"]
+        },
+        {
+          "topic": "Principles of American Democracy",
+          "question": "What is an amendment?",
+          "answers": ["a change (to the Constitution)", "an addition (to the Constitution)"]
+        },
+        {
+          "topic": "Principles of American Democracy",
+          "question": "What do we call the first ten amendments to the Constitution?",
+          "answers": ["the Bill of Rights"]
+        },
+        {
+          "topic": "Principles of American Democracy",
+          "question": "What is one right or freedom from the First Amendment?",
+          "answers": ["speech", "religion", "assembly", "press", "petition the government"]
+        },
+        {
+          "topic": "Principles of American Democracy",
+          "question": "How many amendments does the Constitution have?",
+          "answers": ["twenty-seven (27)"]
+        },
+        {
+          "topic": "Principles of American Democracy",
+          "question": "What did the Declaration of Independence do?",
+          "answers": ["announced our independence (from Great Britain)", "declared our independence (from Great Britain)", "said that the United States is free (from Great Britain)"]
+        },
+        {
+          "topic": "Principles of American Democracy",
+          "question": "What are two rights in the Declaration of Independence?",
+          "answers": ["life", "liberty", "pursuit of happiness"]
+        },
+        {
+          "topic": "Principles of American Democracy",
+          "question": "What is freedom of religion?",
+          "answers": ["You can practice any religion, or not practice a religion."]
+        },
+        {
+          "topic": "Principles of American Democracy",
+          "question": "What is the economic system in the United States?",
+          "answers": ["capitalist economy", "market economy"]
+        },
+        {
+          "topic": "Principles of American Democracy",
+          "question": "What is the \"rule of law\"?",
+          "answers": ["Everyone must follow the law.", "Leaders must obey the law.", "Government must obey the law.", "No one is above the law."]
+        },
+        {
+          "topic": "System of Government",
+          "question": "Name one branch or part of the government.",
+          "answers": ["Congress", "legislative", "President", "executive", "the courts", "judicial"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "What stops one branch of government from becoming too powerful?",
+          "answers": ["checks and balances", "separation of powers"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "Who is in charge of the executive branch?",
+          "answers": ["the President"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "Who makes federal laws?",
+          "answers": ["Congress", "Senate and House (of Representatives)", "(U.S. or national) legislature"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "What are the two parts of the U.S. Congress?",
+          "answers": ["the Senate and House (of Representatives)"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "How many U.S. Senators are there?",
+          "answers": ["one hundred (100)"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "We elect a U.S. Senator for how many years?",
+          "answers": ["six (6)"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "Who is one of your state's U.S. Senators now?",
+          "answers": ["Dianne Feinstein", "Alex Padilla"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "The House of Representatives has how many voting members?",
+          "answers": ["four hundred thirty-five (435)"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "We elect a U.S. Representative for how many years?",
+          "answers": ["two (2)"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "Name your U.S. Representative.",
+          "answers": ["Nancy Pelosi"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "Who does a U.S. Senator represent?",
+          "answers": ["all people of the state"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "Why do some states have more Representatives than other states?",
+          "answers": ["(because of) the state's population", "(because) they have more people", "(because) some states have more people"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "We elect a President for how many years?",
+          "answers": ["four (4)"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "In what month do we vote for President?",
+          "answers": ["November"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "What is the name of the President of the United States now?",
+          "answers": ["Joseph R. Biden, Jr.", "Joe Biden", "Biden"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "What is the name of the Vice President of the United States now?",
+          "answers": ["Kamala D. Harris", "Kamala Harris", "Harris"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "If the President can no longer serve, who becomes President?",
+          "answers": ["the Vice President"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "If both the President and the Vice President can no longer serve, who becomes President?",
+          "answers": ["the Speaker of the House"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "Who is the Commander in Chief of the military?",
+          "answers": ["the President"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "Who signs bills to become laws?",
+          "answers": ["the President"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "Who vetoes bills?",
+          "answers": ["the President"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "What does the President's Cabinet do?",
+          "answers": ["advises the President"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "What are two Cabinet-level positions?",
+          "answers": ["Secretary of Agriculture", "Secretary of Commerce", "Secretary of Defense", "Secretary of Education", "Secretary of Energy", "Secretary of Health and Human Services", "Secretary of Homeland Security", "Secretary of Housing and Urban Development", "Secretary of the Interior", "Secretary of Labor", "Secretary of State", "Secretary of Transportation", "Secretary of the Treasury", "Secretary of Veterans Affairs", "Attorney General", "Vice President"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "What does the judicial branch do?",
+          "answers": ["reviews laws", "explains laws", "resolves disputes (disagreements)", "decides if a law goes against the Constitution"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "What is the highest court in the United States?",
+          "answers": ["the Supreme Court"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "How many justices are on the Supreme Court?",
+          "answers": ["nine (9)"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "Who is the Chief Justice of the United States now?",
+          "answers": ["John Roberts", "John G. Roberts, Jr."]
+        },
+        {
+          "topic": "System of Government",
+          "question": "Under our Constitution, some powers belong to the federal government. What is one power of the federal government?",
+          "answers": ["to print money", "to declare war", "to create an army", "to make treaties"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "Under our Constitution, some powers belong to the states. What is one power of the states?",
+          "answers": ["provide schooling and education", "provide protection (police)", "provide safety (fire departments)", "give a driver's license", "approve zoning and land use"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "Who is the Governor of your state now?",
+          "answers": ["Gavin Newsom"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "What is the capital of your state?",
+          "answers": ["Sacramento"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "What are the two major political parties in the United States?",
+          "answers": ["Democratic and Republican"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "What is the political party of the President now?",
+          "answers": ["Democratic (Party)"]
+        },
+        {
+          "topic": "System of Government",
+          "question": "What is the name of the Speaker of the House of Representatives now?",
+          "answers": ["Kevin McCarthy", "McCarthy"]
+        },
+        {
+          "topic": "Rights and Responsibilities",
+          "question": "There are four amendments to the Constitution about who can vote. Describe one of them.",
+          "answers": ["Citizens eighteen (18) and older (can vote).", "You don't have to pay (a poll tax) to vote.", "Any citizen can vote. (Women and men can vote.)", "A male citizen of any race (can vote)."]
+        },
+        {
+          "topic": "Rights and Responsibilities",
+          "question": "What is one responsibility that is only for United States citizens?",
+          "answers": ["serve on a jury", "vote in a federal election"]
+        },
+        {
+          "topic": "Rights and Responsibilities",
+          "question": "Name one right only for United States citizens.",
+          "answers": ["vote in a federal election", "run for federal office"]
+        },
+        {
+          "topic": "Rights and Responsibilities",
+          "question": "What are two rights of everyone living in the United States?",
+          "answers": ["freedom of expression", "freedom of speech", "freedom of assembly", "freedom to petition the government", "freedom of religion", "the right to bear arms"]
+        },
+        {
+          "topic": "Rights and Responsibilities",
+          "question": "What do we show loyalty to when we say the Pledge of Allegiance?",
+          "answers": ["the United States", "the flag"]
+        },
+        {
+          "topic": "Rights and Responsibilities",
+          "question": "What is one promise you make when you become a United States citizen?",
+          "answers": ["give up loyalty to other countries", "defend the Constitution and laws of the United States", "obey the laws of the United States", "serve in the U.S. military (if needed)", "serve (do important work for) the nation (if needed)", "be loyal to the United States"]
+        },
+        {
+          "topic": "Rights and Responsibilities",
+          "question": "How old do citizens have to be to vote for President?",
+          "answers": ["eighteen (18) and older"]
+        },
+        {
+          "topic": "Rights and Responsibilities",
+          "question": "What are two ways that Americans can participate in their democracy?",
+          "answers": ["vote", "join a political party", "help with a campaign", "join a civic group", "join a community group", "give an elected official your opinion on an issue", "call Senators and Representatives", "publicly support or oppose an issue or policy", "run for office", "write to a newspaper"]
+        },
+        {
+          "topic": "Rights and Responsibilities",
+          "question": "When is the last day you can send in federal income tax forms?",
+          "answers": ["April 15"]
+        },
+        {
+          "topic": "Rights and Responsibilities",
+          "question": "When must all men register for the Selective Service?",
+          "answers": ["at age eighteen (18)", "between eighteen (18) and twenty-six (26)"]
+        },
+        {
+          "topic": "Colonial Period and Independence",
+          "question": "What is one reason colonists came to America?",
+          "answers": ["freedom", "political liberty", "religious freedom", "economic opportunity", "practice their religion", "escape persecution"]
+        },
+        {
+          "topic": "Colonial Period and Independence",
+          "question": "Who lived in America before the Europeans arrived?",
+          "answers": ["American Indians", "Native Americans"]
+        },
+        {
+          "topic": "Colonial Period and Independence",
+          "question": "What group of people was taken to America and sold as slaves?",
+          "answers": ["Africans", "people from Africa"]
+        },
+        {
+          "topic": "Colonial Period and Independence",
+          "question": "Why did the colonists fight the British?",
+          "answers": ["because of high taxes (taxation without representation)", "because the British army stayed in their houses (boarding, quartering)", "because they didn't have self-government"]
+        },
+        {
+          "topic": "Colonial Period and Independence",
+          "question": "Who wrote the Declaration of Independence?",
+          "answers": ["(Thomas) Jefferson"]
+        },
+        {
+          "topic": "Colonial Period and Independence",
+          "question": "When was the Declaration of Independence adopted?",
+          "answers": ["July 4, 1776"]
+        },
+        {
+          "topic": "Colonial Period and Independence",
+          "question": "There were 13 original states. Name three.",
+          "answers": ["New Hampshire", "Massachusetts", "Rhode Island", "Connecticut", "New York", "New Jersey", "Pennsylvania", "Delaware", "Maryland", "Virginia", "North Carolina", "South Carolina", "Georgia"]
+        },
+        {
+          "topic": "Colonial Period and Independence",
+          "question": "What happened at the Constitutional Convention?",
+          "answers": ["The Constitution was written.", "The Founding Fathers wrote the Constitution."]
+        },
+        {
+          "topic": "Colonial Period and Independence",
+          "question": "When was the Constitution written?",
+          "answers": ["1787"]
+        },
+        {
+          "topic": "Colonial Period and Independence",
+          "question": "The Federalist Papers supported the passage of the U.S. Constitution. Name one of the writers.",
+          "answers": ["(James) Madison", "(Alexander) Hamilton", "(John) Jay", "Publius"]
+        },
+        {
+          "topic": "Colonial Period and Independence",
+          "question": "What is one thing Benjamin Franklin is famous for?",
+          "answers": ["U.S. diplomat", "oldest member of the Constitutional Convention", "first Postmaster General of the United States", "writer of \"Poor Richard's Almanac\"", "started the first free libraries"]
+        },
+        {
+          "topic": "Colonial Period and Independence",
+          "question": "Who is the \"Father of Our Country\"?",
+          "answers": ["(George) Washington"]
+        },
+        {
+          "topic": "Colonial Period and Independence",
+          "question": "Who was the first President?",
+          "answers": ["(George) Washington"]
+        },
+        {
+          "topic": "1800s",
+          "question": "What territory did the United States buy from France in 1803?",
+          "answers": ["the Louisiana Territory", "Louisiana"]
+        },
+        {
+          "topic": "1800s",
+          "question": "Name one war fought by the United States in the 1800s.",
+          "answers": ["War of 1812", "Mexican-American War", "Civil War", "Spanish-American War"]
+        },
+        {
+          "topic": "1800s",
+          "question": "Name the U.S. war between the North and the South.",
+          "answers": ["the Civil War", "the War between the States"]
+        },
+        {
+          "topic": "1800s",
+          "question": "Name one problem that led to the Civil War.",
+          "answers": ["slavery", "economic reasons", "states' rights"]
+        },
+        {
+          "topic": "1800s",
+          "question": "What was one important thing that Abraham Lincoln did?",
+          "answers": ["freed the slaves (Emancipation Proclamation)", "saved (or preserved) the Union", "led the United States during the Civil War"]
+        },
+        {
+          "topic": "1800s",
+          "question": "What did the Emancipation Proclamation do?",
+          "answers": ["freed the slaves", "freed slaves in the Confederacy", "freed slaves in the Confederate states", "freed slaves in most Southern states"]
+        },
+        {
+          "topic": "1800s",
+          "question": "What did Susan B. Anthony do?",
+          "answers": ["fought for women's rights", "fought for civil rights"]
+        },
+        {
+          "topic": "Recent American History and Other Important Historical Information",
+          "question": "Name one war fought by the United States in the 1900s.",
+          "answers": ["World War I", "World War II", "Korean War", "Vietnam War", "(Persian) Gulf War"]
+        },
+        {
+          "topic": "Recent American History and Other Important Historical Information",
+          "question": "Who was President during World War I?",
+          "answers": ["(Woodrow) Wilson"]
+        },
+        {
+          "topic": "Recent American History and Other Important Historical Information",
+          "question": "Who was President during the Great Depression and World War II?",
+          "answers": ["(Franklin) Roosevelt"]
+        },
+        {
+          "topic": "Recent American History and Other Important Historical Information",
+          "question": "Who did the United States fight in World War II?",
+          "answers": ["Japan, Germany, and Italy"]
+        },
+        {
+          "topic": "Recent American History and Other Important Historical Information",
+          "question": "Before he was President, Eisenhower was a general. What war was he in?",
+          "answers": ["World War II"]
+        },
+        {
+          "topic": "Recent American History and Other Important Historical Information",
+          "question": "During the Cold War, what was the main concern of the United States?",
+          "answers": ["Communism"]
+        },
+        {
+          "topic": "Recent American History and Other Important Historical Information",
+          "question": "What movement tried to end racial discrimination?",
+          "answers": ["civil rights (movement)"]
+        },
+        {
+          "topic": "Recent American History and Other Important Historical Information",
+          "question": "What did Martin Luther King, Jr. do?",
+          "answers": ["fought for civil rights", "worked for equality for all Americans"]
+        },
+        {
+          "topic": "Recent American History and Other Important Historical Information",
+          "question": "What major event happened on September 11, 2001, in the United States?",
+          "answers": ["Terrorists attacked the United States."]
+        },
+        {
+          "topic": "Recent American History and Other Important Historical Information",
+          "question": "Name one American Indian tribe in the United States.",
+          "answers": ["Cherokee", "Navajo", "Sioux", "Chippewa", "Choctaw", "Pueblo", "Apache", "Iroquois", "Creek", "Blackfeet", "Seminole", "Cheyenne", "Arawak", "Shawnee", "Mohegan", "Huron", "Oneida", "Lakota", "Crow", "Teton", "Hopi", "Inuit"]
+        },
+        {
+          "topic": "Geography",
+          "question": "Name one of the two longest rivers in the United States.",
+          "answers": ["Missouri (River)", "Mississippi (River)"]
+        },
+        {
+          "topic": "Geography",
+          "question": "What ocean is on the West Coast of the United States?",
+          "answers": ["Pacific (Ocean)"]
+        },
+        {
+          "topic": "Geography",
+          "question": "What ocean is on the East Coast of the United States?",
+          "answers": ["Atlantic (Ocean)"]
+        },
+        {
+          "topic": "Geography",
+          "question": "Name one U.S. territory.",
+          "answers": ["Puerto Rico", "U.S. Virgin Islands", "American Samoa", "Northern Mariana Islands", "Guam"]
+        },
+        {
+          "topic": "Geography",
+          "question": "Name one state that borders Canada.",
+          "answers": ["Maine", "New Hampshire", "Vermont", "New York", "Pennsylvania", "Ohio", "Michigan", "Minnesota", "North Dakota", "Montana", "Idaho", "Washington", "Alaska"]
+        },
+        {
+          "topic": "Geography",
+          "question": "Name one state that borders Mexico.",
+          "answers": ["California", "Arizona", "New Mexico", "Texas"]
+        },
+        {
+          "topic": "Geography",
+          "question": "What is the capital of the United States?",
+          "answers": ["Washington, D.C."]
+        },
+        {
+          "topic": "Geography",
+          "question": "Where is the Statue of Liberty?",
+          "answers": ["New York (Harbor)", "Liberty Island", "*Also acceptable are New Jersey, near New York City, and on the Hudson (River)."]
+        },
+        {
+          "topic": "Symbols",
+          "question": "Why does the flag have 13 stripes?",
+          "answers": ["because there were 13 original colonies", "because the stripes represent the original colonies"]
+        },
+        {
+          "topic": "Symbols",
+          "question": "Why does the flag have 50 stars?",
+          "answers": ["because there is one star for each state", "because each star represents a state", "because there are 50 states"]
+        },
+        {
+          "topic": "Symbols",
+          "question": "What is the name of the national anthem?",
+          "answers": ["The Star-Spangled Banner"]
+        },
+        {
+          "topic": "Holidays",
+          "question": "When do we celebrate Independence Day?",
+          "answers": ["July 4"]
+        },
+        {
+          "topic": "Holidays",
+          "question": "Name two national U.S. holidays.",
+          "answers": ["New Year's Day", "Martin Luther King, Jr. Day", "Presidents' Day", "Memorial Day", "Juneteenth", "Independence Day", "Labor Day", "Columbus Day", "Veterans Day", "Thanksgiving", "Christmas"]
+        }
+      ];
+
+      var questionsCorrect = [];
+      var questionsIncorrect = [];
+      var questionsRemaining = [];
+      var currentQuestionIdx = -1;
+
+      function setupPage() {
+        const resetBtn = document.getElementById("resetBtn");
+        resetBtn.addEventListener("click", function() {
+          if (confirm("Are you sure you want to start over?")) {
+            localStorage.setItem("questionsCorrect", JSON.stringify([]));
+            localStorage.setItem("questionsIncorrect", JSON.stringify([]));
+            localStorage.setItem("questionsRemaining", JSON.stringify(QUESTIONS));
+            loadSavedState();
+            setStatistics();
+            showQuestion();
+          }
+        });
+
+        const redoBtn = document.getElementById("redoBtn");
+        redoBtn.addEventListener("click", function() {
+          if (confirm("Incorrect questions will be added back to the queue. OK?")) {
+            redoIncorrectQuestions();
+          }
+        });
+
+        const showAnswersBtn = document.getElementById("showAnswersBtn");
+        showAnswersBtn.addEventListener("click", function() {
+          showAnswers();
+        });
+
+        const correctBtn = document.getElementById("correctBtn");
+        correctBtn.addEventListener("click", function() {
+          scoreQuestion(true);
+        });
+
+        const incorrectBtn = document.getElementById("incorrectBtn");
+        incorrectBtn.addEventListener("click", function() {
+          scoreQuestion(false);
+        });
+
+        loadSavedState();
+        setStatistics();
+        showQuestion();
+      }
+
+      function loadSavedState() {
+        const questionsCorrectString = localStorage.getItem("questionsCorrect");
+        if (questionsCorrectString) {
+          questionsCorrect = JSON.parse(questionsCorrectString);
+        } else {
+          questionsCorrect = [];
+          localStorage.setItem("questionsCorrect", JSON.stringify(questionsCorrect));
+        }
+        const questionsIncorrectString = localStorage.getItem("questionsIncorrect");
+        if (questionsIncorrectString) {
+          questionsIncorrect = JSON.parse(questionsIncorrectString);
+        } else {
+          questionsIncorrect = [];
+          localStorage.setItem("questionsIncorrect", JSON.stringify(questionsIncorrect));
+        }
+        const questionsRemainingString = localStorage.getItem("questionsRemaining");
+        if (questionsRemainingString) {
+          questionsRemaining = JSON.parse(questionsRemainingString);
+        } else {
+          questionsRemaining = QUESTIONS;
+          localStorage.setItem("questionsRemaining", JSON.stringify(questionsRemaining));
+        }
+      }
+
+      function setStatistics() {
+        document.getElementById("numRemaining").innerHTML = questionsRemaining.length;
+        document.getElementById("numCorrect").innerHTML = questionsCorrect.length;
+        document.getElementById("numIncorrect").innerHTML = questionsIncorrect.length;
+        if (questionsCorrect.length + questionsIncorrect.length == 0) {
+          document.getElementById("score").innerHTML = "-";
+        } else {
+          const score = (questionsCorrect.length / (questionsCorrect.length + questionsIncorrect.length) * 100.0).toFixed(1);
+          document.getElementById("score").innerHTML = score + "% (" + questionsCorrect.length + "/" + (questionsCorrect.length + questionsIncorrect.length) + ")";
+        }
+      }
+
+      function showQuestion() {
+        currentQuestionIdx = -1;
+        document.getElementById("topic").innerHTML = "";
+        document.getElementById("question").innerHTML = "";
+        document.getElementById("answersList").innerHTML = "";
+        document.getElementById("answers").style.display = "none";
+
+        if (questionsRemaining.length == 0) {
+          return;
+        }
+
+        currentQuestionIdx = Math.floor(Math.random() * questionsRemaining.length);
+        const currentQuestion = questionsRemaining.at(currentQuestionIdx);
+        document.getElementById("topic").innerHTML = currentQuestion["topic"];
+        document.getElementById("question").innerHTML = currentQuestion["question"];
+        currentQuestion["answers"].forEach(function(a) {
+          const answer = document.createElement("li");
+          answer.innerHTML = a;
+          document.getElementById("answersList").appendChild(answer);
+        });
+      }
+
+      function showAnswers() {
+        document.getElementById("answers").style.display = "block";
+      }
+
+      function scoreQuestion(correct) {
+        if (currentQuestionIdx == -1) {
+          return;
+        }
+
+        if (correct) {
+          questionsCorrect.push(questionsRemaining.at(currentQuestionIdx));
+          localStorage.setItem("questionsCorrect", JSON.stringify(questionsCorrect));
+        } else {
+          questionsIncorrect.push(questionsRemaining.at(currentQuestionIdx));
+          localStorage.setItem("questionsIncorrect", JSON.stringify(questionsIncorrect));
+        }
+        questionsRemaining.splice(currentQuestionIdx, 1);
+        localStorage.setItem("questionsRemaining", JSON.stringify(questionsRemaining));
+        setStatistics();
+        showQuestion();
+      }
+
+      function redoIncorrectQuestions() {
+        if (questionsIncorrect.length == 0) {
+          return;
+        }
+        questionsRemaining = questionsRemaining.concat(questionsIncorrect);
+        questionsIncorrect = [];
+        localStorage.setItem("questionsIncorrect", JSON.stringify(questionsIncorrect));
+        localStorage.setItem("questionsRemaining", JSON.stringify(questionsRemaining));
+        setStatistics();
+        if (currentQuestionIdx == -1) {
+          showQuestion();
+        }
+      }
+    </script>
+  </head>
+
+  <body onload="setupPage();">
+    <div id="header">
+      <table>
+        <tr>
+          <td style="width: 30%;" class="stat-name">Remaining:</td>
+          <td style="width: 30%" class="stat-value"><span id="numRemaining"></span></td>
+          <td style="text-align: right;"><span id="resetBtn">[reset]</span></td>
+        </tr>
+        <tr>
+          <td class="stat-name">Correct:</td>
+          <td class="stat-value"><span id="numCorrect"></span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="stat-name">Incorrect:</td>
+          <td class="stat-value"><span id="numIncorrect"></span></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td class="stat-name">Score:</td>
+          <td class="stat-value"><span id="score"></span></td>
+          <td style="text-align: right;"><span id="redoBtn">[redo incorrect]</span></td>
+        </tr>
+      </table>
+    </div>
+    <div id="topic"></div>
+    <div id="question"></div>
+    <div id="answers">
+      <ul id="answersList"></ul>
+    </div>
+    <div id="actions">
+      <table>
+        <tr>
+          <td style="text-align: center; width: 30%;"><span id="incorrectBtn">[incorrect]</span></td>
+          <td style="text-align: center; width: 30%;"><span id="correctBtn">[correct]</span></td>
+          <td style="text-align: center; width: 40%;"><span id="showAnswersBtn">[show answers]</span></td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>
