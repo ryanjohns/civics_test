@@ -10,29 +10,48 @@
         color: #fff;
         font-family: Helvetica;
         margin: 0;
-        font-size: 14px;
+        font-size: 16px;
+      }
+
+      a {
+        text-decoration: none;
+        color: #fff;
+      }
+
+      table {
+        width: 100%;
       }
 
       #header {
         padding: 10px;
-        margin-bottom: 20px;
         background-color: #111;
       }
 
       #topic {
-        text-align: center;
-        font-size: 12px;
         padding: 10px;
-        margin-bottom: 20px;
+        text-align: center;
+      }
+
+      #content {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+
+      #questionAnswer {
+        display: inline-block;
+        padding-left: 10px;
+        padding-right: 10px;
       }
 
       #question {
-        padding: 10px;
+        text-align: left;
+        font-size: 22px;
       }
 
-      #answers {
-        padding: 20px;
-        margin-bottom: 60px;
+      #answersList {
+        text-align: left;
+        font-size: 18px;
+        margin: 0px;
       }
 
       #actions {
@@ -42,19 +61,24 @@
         bottom: 0;
         width: 100%;
         padding: 10px;
-      }
-
-      table {
-        width: 100%;
-      }
-
-      td.stat-name {
         text-align: right;
+      }
+
+      #actions a {
         padding-right: 20px;
       }
 
-      td.stat-value {
+      .stat-name {
+        text-align: right;
+        padding-right: 10px;
+      }
+
+      .stat-value {
         text-align: left;
+      }
+
+      .stat-link {
+        text-align: right;
       }
     </style>
 
@@ -575,9 +599,10 @@
       var currentQuestionIdx = -1;
 
       function setupPage() {
-        const resetBtn = document.getElementById("resetBtn");
-        resetBtn.addEventListener("click", function() {
-          if (confirm("Are you sure you want to start over?")) {
+        const restartBtn = document.getElementById("restartBtn");
+        restartBtn.addEventListener("click", function(event) {
+          event.preventDefault();
+          if (confirm("Are you sure you want to restart the test?")) {
             localStorage.setItem("questionsCorrect", JSON.stringify([]));
             localStorage.setItem("questionsIncorrect", JSON.stringify([]));
             localStorage.setItem("questionsRemaining", JSON.stringify(QUESTIONS));
@@ -587,25 +612,29 @@
           }
         });
 
-        const redoBtn = document.getElementById("redoBtn");
-        redoBtn.addEventListener("click", function() {
-          if (confirm("Incorrect questions will be added back to the queue. OK?")) {
+        const retestBtn = document.getElementById("retestBtn");
+        retestBtn.addEventListener("click", function(event) {
+          event.preventDefault();
+          if (confirm("Are you sure you want to retest incorrect questions?")) {
             redoIncorrectQuestions();
           }
         });
 
         const showAnswersBtn = document.getElementById("showAnswersBtn");
-        showAnswersBtn.addEventListener("click", function() {
+        showAnswersBtn.addEventListener("click", function(event) {
+          event.preventDefault();
           showAnswers();
         });
 
         const correctBtn = document.getElementById("correctBtn");
-        correctBtn.addEventListener("click", function() {
+        correctBtn.addEventListener("click", function(event) {
+          event.preventDefault();
           scoreQuestion(true);
         });
 
         const incorrectBtn = document.getElementById("incorrectBtn");
-        incorrectBtn.addEventListener("click", function() {
+        incorrectBtn.addEventListener("click", function(event) {
+          event.preventDefault();
           scoreQuestion(false);
         });
 
@@ -655,7 +684,7 @@
         document.getElementById("topic").innerHTML = "";
         document.getElementById("question").innerHTML = "";
         document.getElementById("answersList").innerHTML = "";
-        document.getElementById("answers").style.display = "none";
+        document.getElementById("answersList").style.visibility = "hidden";
 
         if (questionsRemaining.length == 0) {
           return;
@@ -673,7 +702,7 @@
       }
 
       function showAnswers() {
-        document.getElementById("answers").style.display = "block";
+        document.getElementById("answersList").style.visibility = "visible";
       }
 
       function scoreQuestion(correct) {
@@ -714,9 +743,9 @@
     <div id="header">
       <table>
         <tr>
-          <td style="width: 30%;" class="stat-name">Remaining:</td>
-          <td style="width: 30%" class="stat-value"><span id="numRemaining"></span></td>
-          <td style="text-align: right;"><span id="resetBtn">[reset]</span></td>
+          <td class="stat-name" style="width: 30%;">Remaining:</td>
+          <td class="stat-value" style="width: 37%;"><span id="numRemaining"></span></td>
+          <td class="stat-link" style="width: 33%;"><a href="#" id="restartBtn">[restart test]</a></td>
         </tr>
         <tr>
           <td class="stat-name">Correct:</td>
@@ -726,28 +755,26 @@
         <tr>
           <td class="stat-name">Incorrect:</td>
           <td class="stat-value"><span id="numIncorrect"></span></td>
-          <td></td>
+          <td class="stat-link"><a href="#" id="retestBtn">[retest incorrect]</a></td>
         </tr>
         <tr>
           <td class="stat-name">Score:</td>
           <td class="stat-value"><span id="score"></span></td>
-          <td style="text-align: right;"><span id="redoBtn">[redo incorrect]</span></td>
+          <td></td>
         </tr>
       </table>
     </div>
     <div id="topic"></div>
-    <div id="question"></div>
-    <div id="answers">
-      <ul id="answersList"></ul>
+    <div id="content">
+      <div id="questionAnswer">
+        <p id="question"></p>
+        <ul id="answersList"></ul>
+      </div>
     </div>
     <div id="actions">
-      <table>
-        <tr>
-          <td style="text-align: center; width: 30%;"><span id="incorrectBtn">[incorrect]</span></td>
-          <td style="text-align: center; width: 30%;"><span id="correctBtn">[correct]</span></td>
-          <td style="text-align: center; width: 40%;"><span id="showAnswersBtn">[show answers]</span></td>
-        </tr>
-      </table>
+      <a href="#" id="incorrectBtn">[incorrect]</a>
+      <a href="#" id="correctBtn">[correct]</a>
+      <a href="#" id="showAnswersBtn">[show answers]</a>
     </div>
   </body>
 </html>
